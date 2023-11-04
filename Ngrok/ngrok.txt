@@ -1,0 +1,2 @@
+ngrok tcp --region us 5000
+ngrok http --domain=daily-primary-griffon.ngrok-free.app 4242

@@ -1,7 +1,8 @@
 from pymongo import MongoClient
-from flask import Flask, send_file
+from flask import Flask, send_file, request, Response
 import threading
 import middlefunctions
+import searchfunctions
 
 client = None
 
@@ -20,10 +21,41 @@ def put_user():
 
     threading.Thread(target=middlefunctions.put_user(client)).start()
 
+    return "Completed"
+
+@app.route('/put_video1')
+def put_video1():
+
+    threading.Thread(target=middlefunctions.put_video1(client)).start()
 
     return "Completed"
 
+@app.route('/put_video', methods=['POST'])
+def put_video():
+    return middlefunctions.put_video(client, request)
 
+@app.route('/put_post', methods=['POST'])
+def put_post():
+    return middlefunctions.put_post(client, request)
+
+@app.route('/test_vid', methods=['GET'])
+def test_vid():
+
+    with open('./Tokalytics/Tiktok videos/Tiktok videos/baseball/2.mp4', 'rb') as video_file:
+        video_bytes = video_file.read()
+
+    return Response(video_bytes, mimetype='video/mp4')
+
+    with open('./Tokalytics/Tiktok videos/Tiktok videos/baseball/2.mp4', 'rb') as videoFile:
+        bytes_data = videoFile.read()
+
+    from io import BytesIO
+    file_obj = BytesIO(bytes_data)
+
+    # Send the file with appropriate content type and download headers
+    # response = Response(file_obj, content_type='video/mp4')
+    # response.headers['Content-Disposition'] = 'attachment; filename=2.mp4'
+    return file_obj
 
 
 def get_database():
@@ -55,6 +87,7 @@ def get_database():
 #     item_2 = {
 #         "sport_type": "golf",
 #         "data": {
+
 #             "Putts": 8
 #         }
 #     }
@@ -64,4 +97,18 @@ def get_database():
 if __name__ == '__main__':
     client = get_database()
 
-    app.run(debug=True)
+    collection_name = client["Post"]
+
+
+    query_id = "6547204e2dabd976c6e05ceb"
+    
+    
+    searchfunctions.query_mlt2(collection_name, query_id)
+
+    
+
+    # app.run() 
+    app.run(ssl_context=('localhost.crt', 'localhost.key'), debug=True)
+
+
+    
